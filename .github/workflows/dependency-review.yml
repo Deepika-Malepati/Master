@@ -1,0 +1,53 @@
+# Dependency Review Action
+#
+# This Action will scan dependency manifest files that change as part of a Pull Request, surfacing known-vulnerable versions of the packages declared or updated in the PR. Once installed, if the workflow run is marked as required, PRs introducing known-vulnerable packages will be blocked from merging.
+#
+# Source repository: https://github.com/actions/dependency-review-action
+# Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
+name: 'Dependency Review'
+on: [pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v3
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v2
+      - name: First interaction
+        uses: actions/first-interaction@v1.1.1
+        with:
+          # Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}
+          repo-token: 
+          # Comment to post on an individual's first issue
+          issue-message: # optional
+          # Comment to post on an individual's first pull request
+          pr-message: # optional
+      - name: Setup Go environment
+         uses: actions/setup-go@v3.5.0
+         with:
+           # The Go version to download (if necessary) and use. Supports semver spec and ranges.
+           go-version: # optional
+           # Path to the go.mod or go.work file.
+           go-version-file: # optional
+           # Set this option to true if you want the action to always check for the latest available version that satisfies the version spec
+           check-latest: # optional
+           # Used to pull node distributions from go-versions. Since there's a default, this is typically not supplied by the user. When running this action on github.com, the default value is sufficient. When running on GHES, you can pass a personal access token for github.com if you are experiencing rate limiting.
+           token: # optional, default is ${{ github.server_url == 'https://github.com' && github.token || '' }}
+           # Used to specify whether caching is needed. Set to true, if you'd like to enable caching.
+           cache: # optional
+           # Used to specify the path to a dependency file - go.sum
+           cache-dependency-path: # optional
+           # Target architecture for Go to use. Examples: x86, x64. Will use system architecture by default.
+           architecture: # optional
+     - name: Download a Build Artifact
+       uses: actions/download-artifact@v3.0.2
+         with:
+           # Artifact name
+           name: # optional
+           # Destination path
+           path: # optional
